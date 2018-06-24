@@ -23,7 +23,7 @@ print ("""
 
 """)
 print("the first local social network in INSEA ") 
-sys.stdout.write("HI "+ sys.argv[3])
+sys.stdout.write("HI "+ sys.argv[2])
 
 while True:
     sockets_list = [sys.stdin, server]
@@ -36,7 +36,7 @@ while True:
         else:
             message = sys.stdin.readline()
             server.send(message)
-            sys.stdout.write("<"+ sys.argv[3] +">")
+            sys.stdout.write("<"+ sys.argv[2] +">")
             sys.stdout.write(message)
             sys.stdout.flush()
 server.close()
