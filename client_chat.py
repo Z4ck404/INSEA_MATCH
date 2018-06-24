@@ -4,12 +4,12 @@ import select
 import sys
  
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-if len(sys.argv) != 4:
-    print ("Correct usage: script, IP address, port number,name")
+if len(sys.argv) != 3:
+    print ("Correct usage: script, IP address,name")
     exit()
 IP_address = str(sys.argv[1])
-Port = int(sys.argv[2])
-name = str(sys.argv[3])
+Port = 8091
+name = str(sys.argv[2])
 server.connect((IP_address, Port))
 print ("""
   _____ _   _  _____ ______            __  __       _______ _____ _    _ 
@@ -23,7 +23,7 @@ print ("""
 
 """)
 print("the first local social network in INSEA ") 
-sys.stdout.write("HI "+ sys.argv[3])
+sys.stdout.write("HI "+ sys.argv[2])
 
 while True:
     sockets_list = [sys.stdin, server]
@@ -36,7 +36,7 @@ while True:
         else:
             message = sys.stdin.readline()
             server.send(message)
-            sys.stdout.write("<"+ sys.argv[3] +">")
+            sys.stdout.write("<"+ sys.argv[2] +">")
             sys.stdout.write(message)
             sys.stdout.flush()
 server.close()
