@@ -4,12 +4,12 @@ import select
 import sys
  
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-if len(sys.argv) != 4:
-    print ("Correct usage: script, IP address, port number,name")
+if len(sys.argv) != 3:
+    print ("Correct usage: script, IP address,name")
     exit()
 IP_address = str(sys.argv[1])
-Port = int(sys.argv[2])
-name = str(sys.argv[3])
+Port = 8091
+name = str(sys.argv[2])
 server.connect((IP_address, Port))
 print ("""
   _____ _   _  _____ ______            __  __       _______ _____ _    _ 
