@@ -2,6 +2,44 @@
 import socket
 import select
 import sys
+
+def ip_inc(ip):
+  L = ip.split(".")
+  if(L[3]=='255') :
+    L[3] = '0'
+    if(L[2]=='255') :
+      L[2] = '0'
+      if(L[1]=='255') :
+        L[1]= '0'
+        L[0] = str(int(L[0])+1)
+      else :
+        L[1] = str(int(L[1])+1)
+    else :
+      L[2] = str(int(L[2])+1)
+  else :
+    L[3] = str(int(L[3])+1)
+  ip = L[0]+'.'+L[1]+'.'+L[2]+'.'+L[3]
+  return ip
+
+def is_serv(ip):
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  try:
+    s.connect((ip,8091))
+    r = True
+  except Exception:
+    r = False
+  finally:
+    s.close()
+  return r
+
+def check_rooms():
+  ip = "10.11.0.1"
+  L = []
+  while(ip != "10.11.3.255") :
+    if (is_serv(ip)):
+      L += [ip]
+    ip = ip_inc(ip)
+  return L
  
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if len(sys.argv) != 3:
