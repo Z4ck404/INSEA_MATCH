@@ -21,8 +21,13 @@ def ip_inc(ip):
   ip = L[0]+'.'+L[1]+'.'+L[2]+'.'+L[3]
   return ip
 
+def signal_handler(signum, frame):
+  raise Exception("TimeOut")
+
 def is_serv(ip):
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  signal.signal(signal.SIGALRM, signal_handler)
+  signal.setitimer(signal.ITIMER_REAL,0.01)
   try:
     s.connect((ip,8091))
     r = True
