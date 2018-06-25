@@ -32,10 +32,10 @@ def is_serv(ip):
     s.close()
   return r
 
-def check_rooms():
-  ip = "10.11.0.1"
+def check_rooms(ip_init="10.11.0.1",ip_last="10.11.3.255"):
+  ip = ip_init
   L = []
-  while(ip != "10.11.3.255") :
+  while(ip != ip_last) :
     if (is_serv(ip)):
       L += [ip]
     ip = ip_inc(ip)
