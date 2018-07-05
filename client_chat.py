@@ -2,6 +2,19 @@
 import socket
 import select
 import sys
+import signal
+
+def getIPaddr():
+  try :
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("gmail.com",80))
+    ip = s.getsockname()[0]
+    s.close()
+  except Exception :
+    p = "INTERNET NOT TWERKING"
+    print p
+  finally :
+    return ip
 
 def ip_inc(ip):
   L = ip.split(".")
@@ -46,14 +59,39 @@ def check_rooms(ip_init="10.11.0.1",ip_last="10.11.3.255"):
     ip = ip_inc(ip)
   return L
  
+def choose_room():
+  ip = getIPaddr()
+  IP = ip.split(".")
+  if(IP[0] == "10"): #from 10.0.0.1 to 10.255.255.254
+    ip_init = "10.0.0.1"
+    ip_last = "10.255.255.254"
+  elif (IP[0] == "172") : #from 172.16.0.1 to 172.31.255.254
+    ip_init = "172."+str(IP[1])+".0.1"
+    ip_last = "172."+str(IP[1])+".255.254"
+  elif (IP[0] == "192") : #from 192.168.0.1 to 192.168.255.254
+    ip_init = "192.168."+str(IP[2])+".1"
+    ip_last = "192.168."+str(IP[2])+".254"
+  else :
+    ip_init = "0.0.0.0"
+    ip_last = "0.0.0.0"
+  L = check_rooms(ip_init,ip_last)
+  i = 1
+  for e in L :
+    print i, ":", e
+  room = L[int(sys.stdin.readline())-1]
+  return room
+
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-if len(sys.argv) != 3:
-    print ("Correct usage: script, IP address,name")
+if len(sys.argv) != 2:
+    print ("Correct usage: script, name")
     exit()
-IP_address = str(sys.argv[1])
+#IP_address = str(sys.argv[1])
 Port = 8091
-name = str(sys.argv[2])
+name = str(sys.argv[1])
+IP_address = choose_room()
 server.connect((IP_address, Port))
+
 print ("""
   _____ _   _  _____ ______            __  __       _______ _____ _    _ 
  |_   _| \ | |/ ____|  ____|   /\     |  \/  |   /\|__   __/ ____| |  | |
@@ -66,7 +104,7 @@ print ("""
 
 """)
 print("the first local social network in INSEA ") 
-sys.stdout.write("HI "+ sys.argv[2])
+sys.stdout.write("HI "+ sys.argv[1])
 
 while True:
     sockets_list = [sys.stdin, server]
@@ -79,7 +117,7 @@ while True:
         else:
             message = sys.stdin.readline()
             server.send(message)
-            sys.stdout.write("<"+ sys.argv[2] +">")
+            sys.stdout.write("<"+ sys.argv[1] +">")
             sys.stdout.write(message)
             sys.stdout.flush()
 server.close()
