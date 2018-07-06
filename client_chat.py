@@ -15,7 +15,7 @@ def getIPaddr():
     s.close()
   except Exception :
     p = "INTERNET NOT TWERKING"
-    print p
+    print(p)
   finally :
     return ip
 
@@ -76,7 +76,7 @@ def check_rooms(ip_init="10.11.0.1",ip_last="10.11.3.255"):
   ip = ip_init
   L = []
   while(ip != ip_last) :
-    #print "checking ",ip
+    #print("checking ",ip)
     if (is_serv(ip)):
       L += [ip]
     ip = ip_inc(ip)
@@ -131,14 +131,15 @@ def choose_room():
   else :
     ip_init,ip_last = calc_plage(ip,subnetmask)
   msg = "checking from " + ip_init + " to " + ip_last + " (" + str(nb_adr(ip_init,ip_last)) + " adr)"
-  print msg
+  print(msg)
   L = check_rooms(ip_init,ip_last)
   i = 1
   if(len(L) == 0) :
-    print "Rooms not found"
+    print("Rooms not found")
     exit()
   for e in L :
-    print i, ":", e
+    msg = str(i) + " : " + str(e)
+    print(msg)
   room = L[int(sys.stdin.readline())-1]
   return room
 
