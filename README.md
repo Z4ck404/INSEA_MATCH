@@ -5,7 +5,7 @@ one of the machines should run both scripts server_side_chat_room.py and client_
 python server_side_chat_room.py
 ```
 ```
-python client_chat.py [Server_ip] [Name]
+python client_chat.py [Name]
 ```
 the server_ip is the ip adress of the machine who is executing server_side_chat_room.py
 

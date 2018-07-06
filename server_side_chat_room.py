@@ -4,18 +4,8 @@ import select
 import sys
 from thread import *
 
-def getIPaddr():
-    try :
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("gmail.com",80))
-        ip = s.getsockname()[0]
-        s.close()
-    except Exception :
-        p = "INTERNET NOT TWERKING"
-        print p
-    finally :
-        return ip
-        
+from tools.server_helper import *
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 """
@@ -29,35 +19,6 @@ server.bind((IP_address, Port))
 server.listen(100)
  
 list_of_clients = []
- 
-def clientthread(conn, addr):
- 
-    conn.send("--- you are connected ---")
- 
-    while True:
-            try:
-                message = conn.recv(2048)
-                if message:
-                    print ("<" + addr[0] + "> " + message)
-                    message_to_send = "<" + addr[0] + "> " + message
-                    broadcast(message_to_send, conn)
- 
-                else:
-                    remove(conn)
- 
-            except:
-                continue
-def broadcast(message, connection):
-    for clients in list_of_clients:
-        if clients!=connection:
-            try:
-                clients.send(message)
-            except:
-                clients.close()
-                remove(clients)
-def remove(connection):
-    if connection in list_of_clients:
-        list_of_clients.remove(connection)
  
 while True:
     conn, addr = server.accept()
