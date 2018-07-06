@@ -15,3 +15,7 @@ you can also execute the client script with bash script chat_room.sh
 ./chat_room.sh
 ```
 and then type the information he will ask you about .
+
+## Needed packages
+
+You'll need to install [netifaces](https://pypi.org/project/netifaces/)

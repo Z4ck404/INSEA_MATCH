@@ -4,6 +4,9 @@ import select
 import sys
 import signal
 
+from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
+import netifaces as ni
+
 def getIPaddr():
   try :
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -36,6 +39,25 @@ def ip_inc(ip):
 
 def signal_handler(signum, frame):
   raise Exception("TimeOut")
+
+def getInterface(ip):
+  for inf in ni.interfaces():
+    if(ni.ifaddresses(inf)[AF_INET][0]['addr'] == ip):
+      return inf
+  exit()
+
+def convertMask(mask):
+  M = mask.split(".")
+  msk = 0
+  for i in M :
+    i = bin(int(i))[2:]
+    for j in i :
+      if j == '1' :
+        msk += 1
+  return msk
+
+def getNetMask(ip):
+  return convertMask( ni.ifaddresses( getInterface(ip) )[AF_INET][0]['netmask'] )
 
 def is_serv(ip):
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,8 +111,9 @@ def nb_adr(init,last):
     return 1
   return 1+nb_adr(ip_inc(init),last)
 
-def choose_room(subnetmask):
+def choose_room():
   ip = getIPaddr()
+  subnetmask = getNetMask(ip)
   IP = ip.split(".")
   if(subnetmask==0):
     if(IP[0] == "10"): #from 10.0.0.1 to 10.255.255.254
@@ -121,16 +144,13 @@ def choose_room(subnetmask):
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-if (len(sys.argv) != 2 and len(sys.argv) != 3):
-    print ("Correct usage: script, name, subnetmask (optionnal)")
+if len(sys.argv) != 2:
+    print ("Correct usage: script, name")
     exit()
 #IP_address = str(sys.argv[1])
 Port = 8091
 name = str(sys.argv[1])
-subnetmask = 0
-if len(sys.argv) == 3 :
-  subnetmask = int(sys.argv[2])
-IP_address = choose_room(subnetmask)
+IP_address = choose_room()
 server.connect((IP_address, Port))
 
 print ("""
