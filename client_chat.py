@@ -54,28 +54,66 @@ def check_rooms(ip_init="10.11.0.1",ip_last="10.11.3.255"):
   ip = ip_init
   L = []
   while(ip != ip_last) :
+    #print "checking ",ip
     if (is_serv(ip)):
       L += [ip]
     ip = ip_inc(ip)
   return L
- 
-def choose_room():
+
+def calc_plage(IP,mask) :
+  IP = IP.split(".")
+  maskgroup = mask // 8
+  maskrange = mask % 8
+  ip_init = ""
+  for i in range(maskgroup) : # Creating the net part of the address
+    ip_init += str(IP[i])+"."
+  ip_last = ip_init #Same net part
+  IP_bin_init = bin(int(IP[maskgroup]))[2:] # we convert the IP into binary and we remore the '0b'
+  IP_bin_init = "0"*(8-len(IP_bin_init)) + IP_bin_init # we make IP_bin have a len of 8
+  
+  IP_bin_init = IP_bin_init[:maskrange] + "0" * (8-maskrange)
+  IP_bin_last = IP_bin_init[:maskrange] + "1" * (8-maskrange)
+
+  ip_init += str(int(IP_bin_init,2))
+  ip_last += str(int(IP_bin_last,2))
+  for j in range(4-maskgroup-1) :
+    ip_init += ".0"
+    ip_last += ".255"
+  ip_init = ip_inc(ip_init)
+  if(ip_last[-1] != 0):
+    ip_last = ip_last[:-1] + str(int(ip_last[-1])-1)
+  return ip_init,ip_last
+
+def nb_adr(init,last):
+  if(init == last) :
+    return 1
+  return 1+nb_adr(ip_inc(init),last)
+
+def choose_room(subnetmask):
   ip = getIPaddr()
   IP = ip.split(".")
-  if(IP[0] == "10"): #from 10.0.0.1 to 10.255.255.254
-    ip_init = "10.0.0.1"
-    ip_last = "10.255.255.254"
-  elif (IP[0] == "172") : #from 172.16.0.1 to 172.31.255.254
-    ip_init = "172."+str(IP[1])+".0.1"
-    ip_last = "172."+str(IP[1])+".255.254"
-  elif (IP[0] == "192") : #from 192.168.0.1 to 192.168.255.254
-    ip_init = "192.168."+str(IP[2])+".1"
-    ip_last = "192.168."+str(IP[2])+".254"
+  if(subnetmask==0):
+    if(IP[0] == "10"): #from 10.0.0.1 to 10.255.255.254
+      ip_init = "10.0.0.1"
+      ip_last = "10.255.255.254"
+    elif (IP[0] == "172") : #from 172.16.0.1 to 172.31.255.254
+      ip_init = "172."+str(IP[1])+".0.1"
+      ip_last = "172."+str(IP[1])+".255.254"
+    elif (IP[0] == "192") : #from 192.168.0.1 to 192.168.255.254
+      ip_init = "192.168."+str(IP[2])+".1"
+      ip_last = "192.168."+str(IP[2])+".254"
+    else :
+      ip_init = "0.0.0.0"
+      ip_last = "0.0.0.0"
   else :
-    ip_init = "0.0.0.0"
-    ip_last = "0.0.0.0"
+    ip_init,ip_last = calc_plage(ip,subnetmask)
+  msg = "checking from " + ip_init + " to " + ip_last + " (" + str(nb_adr(ip_init,ip_last)) + " adr)"
+  print msg
   L = check_rooms(ip_init,ip_last)
   i = 1
+  if(len(L) == 0) :
+    print "Rooms not found"
+    exit()
   for e in L :
     print i, ":", e
   room = L[int(sys.stdin.readline())-1]
@@ -83,13 +121,16 @@ def choose_room():
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-if len(sys.argv) != 2:
-    print ("Correct usage: script, name")
+if (len(sys.argv) != 2 and len(sys.argv) != 3):
+    print ("Correct usage: script, name, subnetmask (optionnal)")
     exit()
 #IP_address = str(sys.argv[1])
 Port = 8091
 name = str(sys.argv[1])
-IP_address = choose_room()
+subnetmask = 0
+if len(sys.argv) == 3 :
+  subnetmask = int(sys.argv[2])
+IP_address = choose_room(subnetmask)
 server.connect((IP_address, Port))
 
 print ("""
